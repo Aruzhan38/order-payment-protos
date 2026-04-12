@@ -2,7 +2,8 @@ name: Generate Proto
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - "*"
 
 jobs:
   generate:

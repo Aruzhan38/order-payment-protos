@@ -31,17 +31,26 @@ jobs:
       - name: Generate code
         run: |
           mkdir -p generated
-          protoc --go_out=generated --go-grpc_out=generated proto/*.proto
+          protoc --go_out=paths=source_relative:generated --go-grpc_out=paths=source_relative:generated proto/payment.proto proto/order.proto
+
+          mkdir -p final/proto/order
+          mkdir -p final/proto/payment
+
+          mv generated/proto/order.pb.go final/proto/order/
+          mv generated/proto/order_grpc.pb.go final/proto/order/
+          mv generated/proto/payment.pb.go final/proto/payment/
+          mv generated/proto/payment_grpc.pb.go final/proto/payment/
 
       - name: Push to generated repo
         run: |
           git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Aruzhan38/order-payment-generated.git
           rm -rf order-payment-generated/proto
-          mv generated order-payment-generated/proto
+          mkdir -p order-payment-generated/proto
+          cp -r final/proto/* order-payment-generated/proto/
 
           cd order-payment-generated
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Auto-generate proto files"
+          git diff --cached --quiet || git commit -m "Auto-generate proto files"
           git push

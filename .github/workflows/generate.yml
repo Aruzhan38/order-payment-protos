@@ -1,4 +1,4 @@
-name: Generate Proto
+name: Generate Proto 1
 
 on:
   push:
